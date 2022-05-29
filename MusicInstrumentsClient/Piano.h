@@ -12,8 +12,8 @@ class Piano : public QWidget
 {
 	Q_OBJECT
 public:
-	Piano(QWidget *parent = nullptr, int keyFirst = 48, int keyLast = 81)
-		: QWidget(parent), mKeyFirst(keyFirst), mKeyLast(keyLast), mPixmapLabel(this)
+	Piano(QWidget *parent = nullptr, int keyFirst = 48)
+		: QWidget(parent), mKeyFirst(keyFirst), mPixmapLabel(this)
 	{
 		calcKeyRects();
 	}		
@@ -24,23 +24,22 @@ protected:
 
 private:
 
-	static const int whiteWidth = 46;
-	static const int whiteHeight = 290;
-	static const int blackWidth = 30;
-	static const int blackHeight = 170;
-	static const int keysCount = 128;
+	static const int WhiteWidth = 46;
+	static const int WhiteHeight = 290;
+	static const int BlackWidth = 30;
+	static const int BlackHeight = 170;
+	static const int KeysCount = 128;
 
 	static bool isBlack(int n);
 
 	void calcKeyRects();
 
+
+
 	int mKeyFirst;
-	int mKeyLast;
 
 	QLabel mPixmapLabel;
 	QPixmap mPianoPixmap;
 	QVector<PianoKey> mPianoKeys{ 128 };
-	//QVector<QRect> mKeyRects{keysCount, {0, 0, 0, 0}};
-	//QVector<bool> mKeyStates = QVector<bool>(keysCount, false);
 };
 

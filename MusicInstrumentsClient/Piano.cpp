@@ -4,23 +4,23 @@
 #include <QPen>
 #include <QBrush>
 #include <qdebug.h>
+#include <QtGlobal>
 
 void Piano::paintEvent(QPaintEvent* event)
 {
     static QPen penBlack(Qt::black);
     static QBrush brushBlack(Qt::black), brushWhite(Qt::white), brushPressed(Qt::gray);
 
-    mPianoPixmap = QPixmap(size());
-    mPixmapLabel.setFixedSize(size());
+    mPianoPixmap = QPixmap(size().width(), qMin(size().height(), WhiteHeight) + 1);
+    mPixmapLabel.setFixedSize(mPianoPixmap.size());
 
     int keyFirst = mKeyFirst - static_cast<int>(isBlack(mKeyFirst));
-    int keyLast = mKeyLast + static_cast<int>(isBlack(mKeyLast));
 
     QPainter painter(&mPianoPixmap);
     painter.setPen(penBlack);
     // White keys are drawn first, then black, because they overlap
     for (int color = 0; color < 2; ++color) {
-        for (int key = keyFirst; key <= keyLast; ++key) {
+        for (int key = keyFirst; key < KeysCount && mPianoKeys[key].rect().left() <= geometry().right(); ++key) {
             if (!mPianoKeys[key].isBlack() ^ color) {
                 if (mPianoKeys[key].isPressed()) {
                     painter.setBrush(brushPressed);
@@ -43,19 +43,18 @@ bool Piano::isBlack(int n)
 
 void Piano::calcKeyRects()
 {
-    static QRect whiteKey(0, 0, whiteWidth, whiteHeight);
-    static QRect blackKey(-blackWidth / 2, 0, blackWidth, blackHeight);
+    QRect whiteKey(0, 0, WhiteWidth, WhiteHeight);
+    QRect blackKey(-BlackWidth / 2, 0, BlackWidth, BlackHeight);
 
     int keyFirst = mKeyFirst - static_cast<int>(isBlack(mKeyFirst));
-    int keyLast = mKeyLast + static_cast<int>(isBlack(mKeyLast));
 
-    for (int key = keyFirst; key <= keyLast; ++key) {
+    for (int key = keyFirst; key < KeysCount; ++key) {
         if (isBlack(key)) {
             mPianoKeys[key] = PianoKey(blackKey, true);
         } else {
             mPianoKeys[key] = PianoKey(whiteKey);
-            whiteKey.translate(whiteWidth, 0);
-            blackKey.translate(whiteWidth, 0);
+            whiteKey.translate(WhiteWidth, 0);
+            blackKey.translate(WhiteWidth, 0);
         }
     }
 }
