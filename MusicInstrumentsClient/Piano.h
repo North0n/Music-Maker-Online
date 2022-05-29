@@ -1,12 +1,25 @@
 #pragma once
-#include <qwidget.h>
+#include <QWidget>
+#include <QLabel>
+#include <QPixmap>
+#include <QVector>
+#include <QRect>
+#include <QPaintEvent>
+
+
 class Piano : public QWidget
 {
 	Q_OBJECT
 public:
-	Piano(int keyFirst = 48, int keyLast = 81, QWidget *parent = nullptr) 
-		: QWidget(parent), mKeyFirst(keyFirst), mKeyLast(keyLast)
-	{}
+	Piano(QWidget *parent = nullptr, int keyFirst = 48, int keyLast = 81)
+		: QWidget(parent), mKeyFirst(keyFirst), mKeyLast(keyLast), mPixmapLabel(this)
+	{
+		calcKeyRects();
+	}		
+
+
+protected:
+	void paintEvent(QPaintEvent* event) override;
 
 private:
 
@@ -14,10 +27,18 @@ private:
 	static const int whiteHeight = 290;
 	static const int blackWidth = 30;
 	static const int blackHeight = 170;
+	static const int keysCount = 128;
 
 	static bool isBlack(int n);
 
-	int mKeyFirst = 48;
-	int mKeyLast = 81;
+	void calcKeyRects();
+
+	int mKeyFirst;
+	int mKeyLast;
+
+	QLabel mPixmapLabel;
+	QPixmap mPianoPixmap;
+	QVector<QRect> mKeyRects{keysCount, {0, 0, 0, 0}};
+	QVector<bool> mKeyStates = QVector<bool>(keysCount, false);
 };
 
