@@ -34,5 +34,5 @@ void ServerSocket::getData()
 {
 	QByteArray bytes(mSocket->pendingDatagramSize(), '\0');
 	mSocket->readDatagram(bytes.data(), mSocket->pendingDatagramSize());
-	emit dataReceived(bytes);
+	emit dataReceived(std::move(bytes));
 }

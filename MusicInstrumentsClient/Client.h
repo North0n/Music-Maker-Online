@@ -24,8 +24,6 @@ private:
 
 	void fillInstruments();
 
-	void connectToServer(const QHostAddress& host, quint16 port);
-
 	std::unique_ptr<FormConnection> mFormConnection;
 
 	const QVector<QString> Instruments =

@@ -20,6 +20,31 @@ Piano::~Piano()
     midiOutClose(hMidiOut);
 }
 
+void Piano::connectToServer(const QHostAddress& host, quint16 port)
+{
+    mServerSocket = std::make_unique<ServerSocket>(mPort, host, port, this);
+    connect(mServerSocket.get(), &ServerSocket::dataReceived, this, &Piano::getMsgFromServer);
+    // Send a message to notify server about our connection
+    mServerSocket->sendShortMsg(0);
+}
+
+void Piano::disconnectFormServer()
+{
+    mServerSocket.reset(nullptr);
+}
+
+void Piano::getMsgFromServer(QByteArray bytes)
+{
+    QDataStream data(&bytes, QIODevice::ReadOnly);
+    quint32 msg;
+    if (!mIsMuted) {
+        while (!data.atEnd()) {
+            data >> msg;
+            midiOutShortMsg(hMidiOut, msg);
+        }
+    }
+}
+
 void Piano::paintEvent(QPaintEvent* event)
 {
     static QPen penBlack(Qt::black);
@@ -145,16 +170,22 @@ int Piano::pointToKey(const QPoint& point) const
 void Piano::noteOn(int note, int channel)
 {
     mPianoKeys[note].setPressed(true);
-    if (!mIsConnected && !mIsMuted) {
-        midiOutShortMsg(hMidiOut, 0x000090 | (mNoteVelocity << 16) | (note << 8) | channel);
+    quint32 msg = 0x000090 | (mNoteVelocity << 16) | (note << 8) | channel;
+    if (!isConnected() && !mIsMuted) {
+        midiOutShortMsg(hMidiOut, msg);
+    } else if (isConnected()) {
+        mServerSocket->sendShortMsg(msg);
     }
 }
 
 void Piano::noteOff(int note, int channel)
 {
     mPianoKeys[note].setPressed(false);
-    if (!mIsConnected && !mIsMuted) {
+    quint32 msg = 0x000080 | (mNoteVelocity << 16) | (note << 8) | channel;
+    if (!isConnected() && !mIsMuted) {
         midiOutShortMsg(hMidiOut, 0x000080 | (mNoteVelocity << 16) | (note << 8) | channel);
+    } else if (isConnected()) {
+        mServerSocket->sendShortMsg(msg);
     }
 }
 

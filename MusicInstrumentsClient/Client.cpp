@@ -14,19 +14,14 @@ void Client::fillInstruments()
     }
 }
 
-void Client::connectToServer(const QHostAddress& host, quint16 port)
-{
-
-}
-
 void Client::on_actConnect_triggered()
 {
     mFormConnection = std::make_unique<FormConnection>(this);
-    connect(mFormConnection.get(), &FormConnection::onConnectPressed, this, &Client::connectToServer);
+    connect(mFormConnection.get(), &FormConnection::onConnectPressed, ui.wPiano, &Piano::connectToServer);
     mFormConnection->show();
 }
 
 void Client::on_actDisconnect_triggered()
 {
-    
+    ui.wPiano->disconnectFormServer();
 }

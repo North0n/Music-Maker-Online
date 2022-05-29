@@ -28,7 +28,7 @@ public:
 	void quit();
 
 signals:
-	void dataReceived(const QByteArray &data);
+	void dataReceived(QByteArray data);
 
 private:
 
