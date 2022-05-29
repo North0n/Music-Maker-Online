@@ -6,6 +6,18 @@
 #include <qdebug.h>
 #include <QtGlobal>
 
+Piano::Piano(QWidget* parent, int keyFirst)
+    : QWidget(parent), mKeyFirst(keyFirst), mPixmapLabel(this)
+{
+    calcKeyRects();
+    midiOutOpen(&hMidiOut, MIDI_MAPPER, NULL, NULL, CALLBACK_NULL);
+}
+
+Piano::~Piano()
+{
+    midiOutClose(hMidiOut);
+}
+
 void Piano::paintEvent(QPaintEvent* event)
 {
     static QPen penBlack(Qt::black);
@@ -34,6 +46,24 @@ void Piano::paintEvent(QPaintEvent* event)
     mPixmapLabel.setPixmap(mPianoPixmap);
 }
 
+void Piano::mousePressEvent(QMouseEvent* event)
+{
+    int key = pointToKey(event->pos());
+    if (key == -1)
+        return;
+
+    mKeyMouse = key;
+    noteOn();
+}
+
+void Piano::mouseReleaseEvent(QMouseEvent* event)
+{
+    if (mKeyMouse == -1)
+        return;
+
+    noteOff();
+}
+
 bool Piano::isBlack(int n)
 {
     // 0x54A = 010101001010b - black keys
@@ -56,5 +86,35 @@ void Piano::calcKeyRects()
             whiteKey.translate(WhiteWidth, 0);
             blackKey.translate(WhiteWidth, 0);
         }
+    }
+}
+
+int Piano::pointToKey(const QPoint& point) const
+{
+    for (int color = 0; color < 2; ++color) {
+        for (int key = 0; key < KeysCount; ++key) {
+            if (mPianoKeys[key].isBlack() ^ static_cast<bool>(color)) {
+                if (mPianoKeys[key].rect().contains(point))
+                    return key;
+            }
+        }
+    }
+
+    return -1;
+}
+
+void Piano::noteOn()
+{
+    mPianoKeys[mKeyMouse].setPressed(true);
+    if (!isConnected) {
+        midiOutShortMsg(hMidiOut, 0x000090 | (mNoteVelocity << 16) | (mKeyMouse << 8) | mMidiChannel);
+    }
+}
+
+void Piano::noteOff()
+{
+    mPianoKeys[mKeyMouse].setPressed(false);
+    if (!isConnected) {
+        midiOutShortMsg(hMidiOut, 0x000080 | (mNoteVelocity << 16) | (mKeyMouse << 8) | mMidiChannel);
     }
 }
