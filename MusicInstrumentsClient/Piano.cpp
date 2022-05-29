@@ -11,6 +11,7 @@ Piano::Piano(QWidget* parent, int keyFirst)
 {
     calcKeyRects();
     midiOutOpen(&hMidiOut, MIDI_MAPPER, NULL, NULL, CALLBACK_NULL);
+    setFocus();
 }
 
 Piano::~Piano()
@@ -49,19 +50,53 @@ void Piano::paintEvent(QPaintEvent* event)
 void Piano::mousePressEvent(QMouseEvent* event)
 {
     int key = pointToKey(event->pos());
-    if (key == -1)
+    if (key == NoKey)
         return;
 
     mKeyMouse = key;
-    noteOn();
+    noteOn(mKeyMouse);
 }
 
 void Piano::mouseReleaseEvent(QMouseEvent* event)
 {
-    if (mKeyMouse == -1)
+    if (mKeyMouse == NoKey)
         return;
 
-    noteOff();
+    noteOff(mKeyMouse);
+}
+
+void Piano::keyPressEvent(QKeyEvent* event)
+{
+    if (event->isAutoRepeat())
+        return;
+    if (event->key() <= 0 || event->key() >= 256) {
+        QWidget::keyPressEvent(event);
+        return;
+    }
+
+    int key = keyToNote[event->key()];
+    if (key == NoKey) {
+        QWidget::keyPressEvent(event);
+        return;
+    }
+    noteOn(key);
+}
+
+void Piano::keyReleaseEvent(QKeyEvent* event)
+{
+    if (event->isAutoRepeat())
+        return;
+    if (event->key() <= 0 || event->key() >= 256) {
+        QWidget::keyReleaseEvent(event);
+        return;
+    }
+
+    int key = keyToNote[event->key()];
+    if (key == NoKey) {
+        QWidget::keyReleaseEvent(event);
+        return;
+    }
+    noteOff(key);
 }
 
 bool Piano::isBlack(int n)
@@ -100,21 +135,21 @@ int Piano::pointToKey(const QPoint& point) const
         }
     }
 
-    return -1;
+    return NoKey;
 }
 
-void Piano::noteOn()
+void Piano::noteOn(int note)
 {
-    mPianoKeys[mKeyMouse].setPressed(true);
+    mPianoKeys[note].setPressed(true);
     if (!isConnected) {
-        midiOutShortMsg(hMidiOut, 0x000090 | (mNoteVelocity << 16) | (mKeyMouse << 8) | mMidiChannel);
+        midiOutShortMsg(hMidiOut, 0x000090 | (mNoteVelocity << 16) | (note << 8) | mMidiChannel);
     }
 }
 
-void Piano::noteOff()
+void Piano::noteOff(int note)
 {
-    mPianoKeys[mKeyMouse].setPressed(false);
+    mPianoKeys[note].setPressed(false);
     if (!isConnected) {
-        midiOutShortMsg(hMidiOut, 0x000080 | (mNoteVelocity << 16) | (mKeyMouse << 8) | mMidiChannel);
+        midiOutShortMsg(hMidiOut, 0x000080 | (mNoteVelocity << 16) | (note << 8) | mMidiChannel);
     }
 }
