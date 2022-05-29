@@ -21,13 +21,13 @@ void Piano::paintEvent(QPaintEvent* event)
     // White keys are drawn first, then black, because they overlap
     for (int color = 0; color < 2; ++color) {
         for (int key = keyFirst; key <= keyLast; ++key) {
-            if (!isBlack(key) ^ color) {
-                if (mKeyStates[key]) {
+            if (!mPianoKeys[key].isBlack() ^ color) {
+                if (mPianoKeys[key].isPressed()) {
                     painter.setBrush(brushPressed);
                 } else {
                     painter.setBrush(color ? brushBlack : brushWhite);
                 }
-                painter.drawRect(mKeyRects[key]);
+                painter.drawRect(mPianoKeys[key].rect());
             }
         }
     }
@@ -43,19 +43,17 @@ bool Piano::isBlack(int n)
 
 void Piano::calcKeyRects()
 {
+    static QRect whiteKey(0, 0, whiteWidth, whiteHeight);
+    static QRect blackKey(-blackWidth / 2, 0, blackWidth, blackHeight);
+
     int keyFirst = mKeyFirst - static_cast<int>(isBlack(mKeyFirst));
     int keyLast = mKeyLast + static_cast<int>(isBlack(mKeyLast));
 
-    QRect whiteKey(0, 0, whiteWidth, whiteHeight);
-    QRect blackKey(-blackWidth / 2, 0, blackWidth, blackHeight);
-
-    mKeyRects.reserve(keyLast - keyFirst + 1);
-    mKeyStates.reserve(keyLast - keyFirst + 1);
     for (int key = keyFirst; key <= keyLast; ++key) {
         if (isBlack(key)) {
-            mKeyRects[key] = blackKey;
+            mPianoKeys[key] = PianoKey(blackKey, true);
         } else {
-            mKeyRects[key] = whiteKey;
+            mPianoKeys[key] = PianoKey(whiteKey);
             whiteKey.translate(whiteWidth, 0);
             blackKey.translate(whiteWidth, 0);
         }

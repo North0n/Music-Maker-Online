@@ -92,6 +92,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Piano.cpp" />
+    <ClCompile Include="PianoKey.cpp" />
     <QtRcc Include="Client.qrc" />
     <QtUic Include="Client.ui" />
     <QtMoc Include="Client.h" />
@@ -100,6 +101,9 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Piano.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="PianoKey.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

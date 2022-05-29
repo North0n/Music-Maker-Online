@@ -43,10 +43,18 @@
     <ClCompile Include="Piano.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PianoKey.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Piano.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="PianoKey.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

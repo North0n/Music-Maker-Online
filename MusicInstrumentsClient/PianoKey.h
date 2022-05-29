@@ -6,6 +6,8 @@ class PianoKey
 {
 public:
 
+	PianoKey() = default;
+
 	PianoKey(QRect keyRect, bool black = false, bool pressed = false)
 		: mKeyRect(keyRect), mIsBlack(black), mIsPressed(pressed)
 	{}
@@ -21,8 +23,8 @@ public:
 	bool isBlack() const;
 
 private:
-	QRect mKeyRect;
-	bool mIsPressed;
-	bool mIsBlack;
+	QRect mKeyRect{0, 0, 0, 0};
+	bool mIsPressed = false;
+	bool mIsBlack = false;
 };
 

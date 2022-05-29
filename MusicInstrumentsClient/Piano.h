@@ -5,6 +5,7 @@
 #include <QVector>
 #include <QRect>
 #include <QPaintEvent>
+#include "PianoKey.h"
 
 
 class Piano : public QWidget
@@ -38,7 +39,8 @@ private:
 
 	QLabel mPixmapLabel;
 	QPixmap mPianoPixmap;
-	QVector<QRect> mKeyRects{keysCount, {0, 0, 0, 0}};
-	QVector<bool> mKeyStates = QVector<bool>(keysCount, false);
+	QVector<PianoKey> mPianoKeys{ 128 };
+	//QVector<QRect> mKeyRects{keysCount, {0, 0, 0, 0}};
+	//QVector<bool> mKeyStates = QVector<bool>(keysCount, false);
 };
 
