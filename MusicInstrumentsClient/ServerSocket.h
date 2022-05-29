@@ -13,6 +13,7 @@ public:
 
 	enum class Commands
 	{
+		EstablishConnection,
 		ShortMsg,
 		Quit,
 	};
@@ -22,6 +23,8 @@ public:
 	~ServerSocket();
 
 	void setServerPort(quint16 port) { mServerPort = port; }
+
+	void establishConnection();
 
 	void sendShortMsg(quint32 msg);
 
