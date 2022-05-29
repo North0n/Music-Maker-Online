@@ -13,3 +13,20 @@ void Client::fillInstruments()
         ui.cbInstrument->addItem(Instruments[i], i);
     }
 }
+
+void Client::connectToServer(const QHostAddress& host, quint16 port)
+{
+
+}
+
+void Client::on_actConnect_triggered()
+{
+    mFormConnection = std::make_unique<FormConnection>(this);
+    connect(mFormConnection.get(), &FormConnection::onConnectPressed, this, &Client::connectToServer);
+    mFormConnection->show();
+}
+
+void Client::on_actDisconnect_triggered()
+{
+    
+}

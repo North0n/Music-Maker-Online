@@ -4,6 +4,8 @@
 #include "ui_Client.h"
 #include <QString>
 #include <QVector>
+#include "FormConnection.h"
+#include <memory>
 
 class Client : public QMainWindow
 {
@@ -12,10 +14,19 @@ class Client : public QMainWindow
 public:
     Client(QWidget *parent = Q_NULLPTR);
 
+public slots:
+	void on_actConnect_triggered();
+
+	void on_actDisconnect_triggered();
+
 private:
     Ui::ClientClass ui;
 
 	void fillInstruments();
+
+	void connectToServer(const QHostAddress& host, quint16 port);
+
+	std::unique_ptr<FormConnection> mFormConnection;
 
 	const QVector<QString> Instruments =
 	{

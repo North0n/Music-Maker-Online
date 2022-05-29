@@ -55,7 +55,7 @@ void Piano::mousePressEvent(QMouseEvent* event)
         return;
 
     mKeyMouse = key;
-    noteOn(mKeyMouse);
+    noteOn(mKeyMouse, mMidiChannel);
 }
 
 void Piano::mouseReleaseEvent(QMouseEvent* event)
@@ -63,11 +63,14 @@ void Piano::mouseReleaseEvent(QMouseEvent* event)
     if (mKeyMouse == NoKey)
         return;
 
-    noteOff(mKeyMouse);
+    noteOff(mKeyMouse, mMidiChannel);
 }
 
 void Piano::keyPressEvent(QKeyEvent* event)
 {
+    if (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_M)
+        mIsMuted = !mIsMuted;
+
     if (event->isAutoRepeat())
         return;
     if (event->key() <= 0 || event->key() >= 256) {
@@ -75,12 +78,12 @@ void Piano::keyPressEvent(QKeyEvent* event)
         return;
     }
 
-    int key = keyToNote[event->key()];
+    int key = KeyToNote[event->key()];
     if (key == NoKey) {
         QWidget::keyPressEvent(event);
         return;
     }
-    noteOn(key);
+    noteOn(key, mMidiChannel);
 }
 
 void Piano::keyReleaseEvent(QKeyEvent* event)
@@ -92,12 +95,12 @@ void Piano::keyReleaseEvent(QKeyEvent* event)
         return;
     }
 
-    int key = keyToNote[event->key()];
+    int key = KeyToNote[event->key()];
     if (key == NoKey) {
         QWidget::keyReleaseEvent(event);
         return;
     }
-    noteOff(key);
+    noteOff(key, mMidiChannel);
 }
 
 bool Piano::isBlack(int n)
@@ -139,18 +142,24 @@ int Piano::pointToKey(const QPoint& point) const
     return NoKey;
 }
 
-void Piano::noteOn(int note)
+void Piano::noteOn(int note, int channel)
 {
     mPianoKeys[note].setPressed(true);
-    if (!isConnected) {
-        midiOutShortMsg(hMidiOut, 0x000090 | (mNoteVelocity << 16) | (note << 8) | mMidiChannel);
+    if (!mIsConnected && !mIsMuted) {
+        midiOutShortMsg(hMidiOut, 0x000090 | (mNoteVelocity << 16) | (note << 8) | channel);
     }
 }
 
-void Piano::noteOff(int note)
+void Piano::noteOff(int note, int channel)
 {
     mPianoKeys[note].setPressed(false);
-    if (!isConnected) {
-        midiOutShortMsg(hMidiOut, 0x000080 | (mNoteVelocity << 16) | (note << 8) | mMidiChannel);
+    if (!mIsConnected && !mIsMuted) {
+        midiOutShortMsg(hMidiOut, 0x000080 | (mNoteVelocity << 16) | (note << 8) | channel);
     }
+}
+
+void Piano::changeInstrument(int index)
+{
+    midiOutShortMsg(hMidiOut, 0x0000C0 | (index << 8) | mMidiChannel);
+    setFocus();
 }

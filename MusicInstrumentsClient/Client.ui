@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>601</width>
+    <width>600</width>
     <height>400</height>
    </rect>
   </property>
@@ -34,12 +34,6 @@
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <widget class="QLabel" name="lblInstrument">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="text">
            <string>Инструмент</string>
           </property>
@@ -69,11 +63,35 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>601</width>
+     <width>600</width>
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Сеть</string>
+    </property>
+    <addaction name="actConnect"/>
+    <addaction name="actDisconnect"/>
+   </widget>
+   <addaction name="menu"/>
   </widget>
+  <action name="actConnect">
+   <property name="text">
+    <string>Подключиться</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actDisconnect">
+   <property name="text">
+    <string>Отключиться</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -82,10 +100,66 @@
    <extends>QWidget</extends>
    <header>Piano.h</header>
    <container>1</container>
+   <slots>
+    <slot>changeInstrument(int)</slot>
+   </slots>
   </customwidget>
  </customwidgets>
  <resources>
   <include location="Client.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>cbInstrument</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>wPiano</receiver>
+   <slot>changeInstrument(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>554</x>
+     <y>65</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>237</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actConnect</sender>
+   <signal>triggered()</signal>
+   <receiver>ClientClass</receiver>
+   <slot>on_actConnect_triggered()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>199</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actDisconnect</sender>
+   <signal>triggered()</signal>
+   <receiver>ClientClass</receiver>
+   <slot>on_actDisconnect_triggered()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>199</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>on_actConnect_triggered()</slot>
+  <slot>on_actDisconnect_triggered()</slot>
+ </slots>
 </ui>
