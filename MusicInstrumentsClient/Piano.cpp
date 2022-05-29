@@ -9,6 +9,7 @@
 Piano::Piano(QWidget* parent, int keyFirst)
     : QWidget(parent), mKeyFirst(keyFirst), mPixmapLabel(this)
 {
+    
     calcKeyRects();
     midiOutOpen(&hMidiOut, MIDI_MAPPER, NULL, NULL, CALLBACK_NULL);
     setFocus();
