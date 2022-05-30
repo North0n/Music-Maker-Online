@@ -25,7 +25,7 @@ void Piano::connectToServer(const QHostAddress& host, quint16 port)
     mServerSocket = std::make_unique<ServerSocket>(mPort, host, port, this);
     connect(mServerSocket.get(), &ServerSocket::dataReceived, this, &Piano::getMsgFromServer);
     // Send a message to notify server about our connection
-    mServerSocket->sendShortMsg(0);
+    mServerSocket->establishConnection();
 }
 
 void Piano::disconnectFormServer()

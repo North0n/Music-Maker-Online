@@ -28,14 +28,14 @@ FormConnection::~FormConnection()
 	delete ui;
 }
 
-void FormConnection::on_pbCancel_clicked()
+void FormConnection::on_pbConnect_clicked()
 {
     if (ui->leIp->hasAcceptableInput() && ui->lePort->hasAcceptableInput())
         emit onConnectPressed(QHostAddress(ui->leIp->text()), ui->lePort->text().toInt());
     close();
 }
 
-void FormConnection::on_pbConnect_clicked()
+void FormConnection::on_pbCancel_clicked()
 {
     close();
 }

@@ -103,7 +103,7 @@ private:
 	quint8 mMidiChannel = 0; // 0 - 9
 
 	// Network
-	std::unique_ptr<ServerSocket> mServerSocket = nullptr;
+	std::unique_ptr<ServerSocket> mServerSocket{ nullptr };
 	quint16 mPort = 20001;
 };
 
