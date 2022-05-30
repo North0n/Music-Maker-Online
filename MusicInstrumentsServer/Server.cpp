@@ -27,7 +27,7 @@ Server::Server(quint16 port, QWidget *parent)
     mReceiver.bind(mHostAddress, mPort);
     connect(&mReceiver, &QUdpSocket::readyRead, this, &Server::receiveData);
 
-    qDebug() << "Waiting for connections on IP: " << mHostAddress.toString() << " port: " << mPort;
+    ui.teLog->append("Waiting for connections on IP: " + mHostAddress.toString() + ":" + QString::number(mPort));
 }
 
 void Server::receiveData()
@@ -52,28 +52,26 @@ void Server::receiveData()
                 return;
             mClients[ClientAddress(address, port)] = mAvailableChannels.top();
             mAvailableChannels.pop();
-            qInfo() << "Connected:" << QHostAddress(address).toString() << ":" << port;
+            ui.teLog->append("Connected: " + QHostAddress(address).toString() + ":" + QString::number(port));
             break;
         case Commands::Quit:
             client = ClientAddress(address, port);
             mAvailableChannels.push(mClients[client]);
             mClients.remove(client);
-            qInfo() << "Disconnected:" << QHostAddress(address).toString() << ":" << port;
+            ui.teLog->append("Disconnected: " + QHostAddress(address).toString() + ":" + QString::number(port));
             break;
         case Commands::ShortMsg:
             in >> message;
-            qDebug() << "From channel:" << mClients[ClientAddress(address, port)];
             message |= mClients[ClientAddress(address, port)];
             out << message;
             it = mClients.constBegin();
             while (it != mClients.constEnd()) {
-                qInfo() << (void*)message;
                 mReceiver.writeDatagram(datagram, QHostAddress(it.key().address), it.key().port);
                 ++it;
             }
             break;
         default:
-            qDebug() << "Unknown command:" << command;
+            ui.teLog->append("Unknown command: " + QString::number(command));
         }
     }
 }
