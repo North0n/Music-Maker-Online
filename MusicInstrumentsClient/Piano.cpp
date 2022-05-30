@@ -191,6 +191,11 @@ void Piano::noteOff(int note, int channel)
 
 void Piano::changeInstrument(int index)
 {
-    midiOutShortMsg(hMidiOut, 0x0000C0 | (index << 8) | mMidiChannel);
+    quint32 msg = 0x0000C0 | (index << 8) | mMidiChannel;
+    if (!isConnected()) {
+        midiOutShortMsg(hMidiOut, msg);
+    } else if (isConnected()) {
+        mServerSocket->sendShortMsg(msg);
+    }
     setFocus();
 }

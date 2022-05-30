@@ -32,7 +32,6 @@ Server::Server(quint16 port, QWidget *parent)
 
 void Server::receiveData()
 {
-    qDebug() << "Received!";
     QHostAddress address;
     quint16 port;
     QByteArray data(mReceiver.pendingDatagramSize(), '\0');
@@ -53,21 +52,22 @@ void Server::receiveData()
                 return;
             mClients[ClientAddress(address, port)] = mAvailableChannels.top();
             mAvailableChannels.pop();
-            qDebug() << "Connected:" << QHostAddress(address).toString() << ":" << port;
+            qInfo() << "Connected:" << QHostAddress(address).toString() << ":" << port;
             break;
         case Commands::Quit:
             client = ClientAddress(address, port);
             mAvailableChannels.push(mClients[client]);
             mClients.remove(client);
-            qDebug() << "Disconnected:" << QHostAddress(address).toString() << ":" << port;
+            qInfo() << "Disconnected:" << QHostAddress(address).toString() << ":" << port;
             break;
         case Commands::ShortMsg:
             in >> message;
+            qDebug() << "From channel:" << mClients[ClientAddress(address, port)];
+            message |= mClients[ClientAddress(address, port)];
+            out << message;
             it = mClients.constBegin();
             while (it != mClients.constEnd()) {
-                quint32 msg = message | it.value();
-                out << msg;
-                qDebug() << (void*) msg;
+                qInfo() << (void*)message;
                 mReceiver.writeDatagram(datagram, QHostAddress(it.key().address), it.key().port);
                 ++it;
             }
