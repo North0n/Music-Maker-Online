@@ -38,8 +38,9 @@ void Server::receiveData()
     mReceiver.readDatagram(data.data(), mReceiver.pendingDatagramSize(), &address, &port);
     
     QByteArray datagram;
-    QDataStream in(&data, QIODevice::ReadOnly), out(&datagram, QIODevice::WriteOnly);
-    quint8 command;
+    QDataStream in(&data, QIODevice::ReadOnly), 
+                out(&datagram, QIODevice::WriteOnly);
+    quint8 command, instrument;
     quint32 message;
     ClientAddress client;
     QMap<ClientAddress, quint8>::const_iterator it;
@@ -52,7 +53,17 @@ void Server::receiveData()
                 return;
             mClients[ClientAddress(address, port)] = mAvailableChannels.top();
             mAvailableChannels.pop();
+            in >> instrument;
+            qDebug() << (void*)instrument;
+            mChannels[mClients[ClientAddress(address, port)]] = instrument;
             ui.teLog->append("Connected: " + QHostAddress(address).toString() + ":" + QString::number(port));
+
+            // Send info about current instruments of already connected cliens
+            out << static_cast<quint8>(Commands::EstablishConnection);
+            for (auto it = mChannels.constBegin(); it != mChannels.constEnd(); ++it) {
+                out << static_cast<quint32>(0x0000C0 | (it.value() << 8) | it.key());
+            }
+            mReceiver.writeDatagram(datagram, address, port);
             break;
         case Commands::Quit:
             client = ClientAddress(address, port);
@@ -62,6 +73,9 @@ void Server::receiveData()
             break;
         case Commands::ShortMsg:
             in >> message;
+            if ((message & 0xFF) == 0xC0) {
+                mChannels[mClients[ClientAddress(address, port)]] = (message & 0xFF00) >> 8;
+            }
             message |= mClients[ClientAddress(address, port)];
             out << message;
             it = mClients.constBegin();

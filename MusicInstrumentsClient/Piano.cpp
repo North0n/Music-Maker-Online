@@ -25,7 +25,27 @@ void Piano::connectToServer(const QHostAddress& host, quint16 port)
     mServerSocket = std::make_unique<ServerSocket>(mPort, host, port, this);
     connect(mServerSocket.get(), &ServerSocket::dataReceived, this, &Piano::getMsgFromServer);
     // Send a message to notify server about our connection
-    mServerSocket->establishConnection();
+    qDebug() << "Midi instrument" << (void*)mMidiInstrument;
+    mServerSocket->establishConnection(mMidiInstrument);
+    auto* const connection = new QMetaObject::Connection;
+    *connection = connect(mServerSocket.get(), &ServerSocket::dataReceived,
+        [this, connection](QByteArray bytes)
+        {
+            quint8 command;
+            QDataStream in(&bytes, QIODevice::ReadOnly);
+
+            in >> command;
+            quint32 message;
+            while (!in.atEnd()) {
+                in >> message;
+                midiOutShortMsg(hMidiOut, message);
+                qDebug() << (void*)message;
+            }
+
+            QObject::disconnect(*connection);
+            delete connection;
+            connect(mServerSocket.get(), &ServerSocket::dataReceived, this, &Piano::getMsgFromServer);
+        });
 }
 
 void Piano::disconnectFormServer()
@@ -191,6 +211,7 @@ void Piano::noteOff(int note, int channel)
 
 void Piano::changeInstrument(int index)
 {
+    mMidiInstrument = index;
     quint32 msg = 0x0000C0 | (index << 8) | mMidiChannel;
     if (!isConnected()) {
         midiOutShortMsg(hMidiOut, msg);

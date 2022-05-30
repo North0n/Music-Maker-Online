@@ -8,6 +8,7 @@
 #include <QSet>
 #include <QPair>
 #include <queue>
+#include <QTimer>
 
 class Server : public QMainWindow
 {
@@ -64,4 +65,6 @@ private:
     QUdpSocket mReceiver;
     // Client (address, port) => channel
     QMap<ClientAddress, quint8> mClients;
+    // Channel => current instrument
+    QMap<quint8, quint32> mChannels;
 };

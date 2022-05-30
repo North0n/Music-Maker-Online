@@ -19,7 +19,7 @@ class Piano : public QWidget
 {
 	Q_OBJECT
 public:
-	Piano(QWidget* parent = nullptr, int keyFirst = 48);
+	Piano(QWidget* parent = nullptr, int keyFirst = 43);
 
 	~Piano();
 
@@ -101,6 +101,7 @@ private:
 	HMIDIOUT hMidiOut;
 	quint8 mNoteVelocity = 0x7F; // (0 - 127)
 	quint8 mMidiChannel = 0; // 0 - 9
+	quint8 mMidiInstrument = 0; // 0 - 127
 
 	// Network
 	std::unique_ptr<ServerSocket> mServerSocket{ nullptr };

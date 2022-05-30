@@ -13,11 +13,12 @@ ServerSocket::~ServerSocket()
 	quit();
 }
 
-void ServerSocket::establishConnection()
+void ServerSocket::establishConnection(quint8 instrument)
 {
 	QByteArray data;
 	QDataStream command(&data, QIODevice::WriteOnly);
-	command << static_cast<quint8>(Commands::EstablishConnection);
+	command << static_cast<quint8>(Commands::EstablishConnection)
+			<< instrument;
 	mSocket->writeDatagram(data, mServerAddress, mServerPort);
 }
 

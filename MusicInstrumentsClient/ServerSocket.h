@@ -4,6 +4,8 @@
 #include <QUdpSocket>
 #include <memory>
 #include <QByteArray>
+#include "Windows.h"
+#include "mmeapi.h"
 
 class ServerSocket : public QObject
 {
@@ -24,7 +26,7 @@ public:
 
 	void setServerPort(quint16 port) { mServerPort = port; }
 
-	void establishConnection();
+	void establishConnection(quint8 instrument);
 
 	void sendShortMsg(quint32 msg);
 
