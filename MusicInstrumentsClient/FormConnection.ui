@@ -122,40 +122,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
- <connections>
-  <connection>
-   <sender>pbConnect</sender>
-   <signal>clicked()</signal>
-   <receiver>FormConnection</receiver>
-   <slot>on_pbConnect_clicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>97</x>
-     <y>123</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>154</x>
-     <y>74</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pbCancel</sender>
-   <signal>clicked()</signal>
-   <receiver>FormConnection</receiver>
-   <slot>on_pbCancel_clicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>229</x>
-     <y>123</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>154</x>
-     <y>74</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
  <slots>
   <slot>on_pbConnect_clicked()</slot>
   <slot>on_pbCancel_clicked()</slot>

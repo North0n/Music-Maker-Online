@@ -38,7 +38,8 @@ void Server::receiveData()
     QByteArray data(mReceiver.pendingDatagramSize(), '\0');
     mReceiver.readDatagram(data.data(), mReceiver.pendingDatagramSize(), &address, &port);
     
-    QDataStream in(&data, QIODevice::ReadOnly);
+    QByteArray datagram;
+    QDataStream in(&data, QIODevice::ReadOnly), out(&datagram, QIODevice::WriteOnly);
     quint8 command;
     quint32 message;
     ClientAddress client;
@@ -64,8 +65,11 @@ void Server::receiveData()
             in >> message;
             it = mClients.constBegin();
             while (it != mClients.constEnd()) {
-                quint8 msg = message | it.value();
-                mReceiver.writeDatagram(reinterpret_cast<char*>(&msg), sizeof(message), QHostAddress(it.key().address), it.key().port);
+                quint32 msg = message | it.value();
+                out << msg;
+                qDebug() << (void*) msg;
+                mReceiver.writeDatagram(datagram, QHostAddress(it.key().address), it.key().port);
+                ++it;
             }
             break;
         default:
