@@ -52,7 +52,7 @@ void Piano::createRoom(const QHostAddress& host, quint16 port)
 
     mServerSocket = std::make_unique<ServerSocket>(mPort, host, port, this);
 
-    mServerSocket->establishConnection(mMidiInstrument);
+    mServerSocket->createRoom();
     *connection = connect(mServerSocket.get(), &ServerSocket::dataReceived, setRoomPort);
 }
 

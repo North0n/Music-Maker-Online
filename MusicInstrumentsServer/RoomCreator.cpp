@@ -36,6 +36,11 @@ void RoomCreator::createRoom()
     quint16 clientPort;
     QByteArray bytes(mReceiver.pendingDatagramSize(), '\0');
     mReceiver.readDatagram(bytes.data(), mReceiver.pendingDatagramSize(), &clientAddress, &clientPort);
+    QDataStream in(&bytes, QIODevice::ReadOnly);
+    quint8 command;
+    in >> command;
+    if (command != Commands::CreateRoom)
+        return;
     
     if (mAvailablePorts.empty()) {
         ui.teLog->append("Cannot create a new room, limit is reached");
