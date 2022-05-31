@@ -41,13 +41,14 @@ void RoomCreator::createRoom()
         ui.teLog->append("Cannot create a new room, limit is reached");
         return;
     }
-    mRooms[mAvailablePorts.top()] = new Room(mHostAddress, mAvailablePorts.top(), this);
+    mRooms[mAvailablePorts.top()] = new Room(mHostAddress, mAvailablePorts.top(), MaxRoomDowntime, this);
     ui.teLog->append("Created: room: " + mHostAddress.toString() + ":" + QString::number(mAvailablePorts.top()));
     connect(mRooms[mAvailablePorts.top()], &Room::destroyRoom, this, &RoomCreator::destroyRoom);
 
     QByteArray configuration;
     QDataStream out(&configuration, QIODevice::WriteOnly);
-    out << mAvailablePorts.top()
+    out << static_cast<quint8>(Commands::EstablishConnection)
+        << mAvailablePorts.top()
         << MaxRoomDowntime;
     mReceiver.writeDatagram(configuration, clientAddress, clientPort);
 

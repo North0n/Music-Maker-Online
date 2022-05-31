@@ -66,7 +66,7 @@ private:
 
     const quint16 MinPort = 30000;
     const quint16 MaxPort = 40000;
-    const quint16 MaxRoomDowntime = 60 * 5;
+    const quint16 MaxRoomDowntime = 30 * 1000;
 
     Ui::ServerClass ui;
 

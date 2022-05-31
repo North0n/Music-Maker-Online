@@ -35,12 +35,14 @@ void Piano::createRoom(const QHostAddress& host, quint16 port)
 
     auto setRoomPort = [this, host, port, connection](QByteArray bytes)
     {
+        quint8 command;
         quint16 port;
         QDataStream in(&bytes, QIODevice::ReadOnly);
 
-        in >> port >> mMaxServerDowntime;
+        in >> command >> port >> mMaxServerDowntime;
         mServerSocket->setServerPort(port);
-        QMessageBox::information(this, "Комната создана", QString("Комната создана по адресу ") + host.toString() + ":" + QString::number(port));
+
+        QMessageBox::information(this, tr("Room is created"), tr("Room address: ") + host.toString() + ":" + QString::number(port));
 
         QObject::disconnect(*connection);
         delete connection;
@@ -62,11 +64,24 @@ void Piano::disconnectFormServer()
 void Piano::getMsgFromServer(QByteArray bytes)
 {
     QDataStream data(&bytes, QIODevice::ReadOnly);
+    quint8 command;
     quint32 msg;
     while (!data.atEnd()) {
-        data >> msg;
-        if (!mIsMuted || ((msg & 0xF0) == 0xC0)) {
-            midiOutShortMsg(hMidiOut, msg);
+        data >> command;
+        switch (command)
+        {
+        case static_cast<quint8>(ServerSocket::Commands::ShortMsg):
+            data >> msg;
+            if (!mIsMuted || ((msg & 0xF0) == 0xC0)) {
+                midiOutShortMsg(hMidiOut, msg);
+            }
+            break;
+        case static_cast<quint8>(ServerSocket::Commands::Quit):
+            QMessageBox::information(this, "Disconnect", "You was disconnected due to afk for more than " + QString::number(mMaxServerDowntime / 1000) + " seconds");
+            mServerSocket.reset(nullptr);
+            break;
+        default:
+            break;
         }
     }
 }
