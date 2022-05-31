@@ -4,26 +4,16 @@
 #include <QDataStream>
 #include <QNetworkInterface>
 #include <QDebug>
+#include <QHostInfo>
 
-QHostAddress RoomCreator::getIpAddress()
-{
-    const QHostAddress& localhost = QHostAddress(QHostAddress::LocalHost);
-    for (const QHostAddress& address : QNetworkInterface::allAddresses()) {
-        if (address.protocol() == QAbstractSocket::IPv4Protocol && address != localhost)
-            return address;
-    }
-    return QHostAddress::LocalHost;
-}
-
-RoomCreator::RoomCreator(quint16 port, QWidget *parent)
-    : QMainWindow(parent), mPort(port)
+RoomCreator::RoomCreator(const QHostAddress& address, quint16 port, QWidget* parent)
+    : QMainWindow(parent), mHostAddress(address), mPort(port)
 {
     for (int i = MinPort; i < MaxPort; ++i)
         mAvailablePorts.push(i);
 
     ui.setupUi(this);
 
-    // TODO менять бинд при изменении пользователем адреса
     mReceiver.bind(mHostAddress, mPort);
     connect(&mReceiver, &QUdpSocket::readyRead, this, &RoomCreator::createRoom);
 

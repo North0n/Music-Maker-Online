@@ -52,9 +52,7 @@ public:
         Quit,
     };
 
-    RoomCreator(quint16 port, QWidget *parent = Q_NULLPTR);
-
-    static QHostAddress getIpAddress();
+    RoomCreator(const QHostAddress &address, quint16 port, QWidget *parent = Q_NULLPTR);
 
 private slots:
 

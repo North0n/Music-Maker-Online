@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>FormConnection</string>
+   <string>Подключиться к комнате</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -22,7 +22,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Подключение к серверу</string>
+      <string>Подключение к комнате</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
