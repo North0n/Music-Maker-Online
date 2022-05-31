@@ -11,6 +11,7 @@
 #include <QPoint>
 #include <QMouseEvent>
 #include <QKeyEvent>
+#include <QTimer>
 
 #include "Windows.h"
 #include "mmeapi.h"
@@ -36,6 +37,8 @@ public slots:
 
 	void getMsgFromServer(QByteArray bytes);
 
+	void isConnectionSuccessfull();
+
 protected:
 	void paintEvent(QPaintEvent* event) override;
 
@@ -57,6 +60,8 @@ private:
 	const int KeysCount = 128;
 
 	const int NoKey = 0xFF;
+
+	const int WaitForConnectionSeconds = 5;
 
 	const quint8 KeyToNote[256] = {
 		//   0     1     2     3     4     5     6     7     8     9     A     B     C     D     E     F	
@@ -109,5 +114,7 @@ private:
 	std::unique_ptr<ServerSocket> mServerSocket{ nullptr };
 	quint16 mPort = 20001;
 	quint16 mMaxServerDowntime;
+	QTimer mTimerSuccessfullConnection;
+	bool mIsConnectionSuccessfull = false;
 };
 

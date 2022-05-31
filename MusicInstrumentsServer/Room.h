@@ -61,8 +61,6 @@ public:
 
     void receiveData();
 
-    // TODO add disconnect on timer
-
 signals:
     void destroyRoom(quint16 port);
 

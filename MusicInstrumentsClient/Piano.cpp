@@ -13,6 +13,8 @@ Piano::Piano(QWidget* parent, int keyFirst)
     calcKeyRects();
     midiOutOpen(&hMidiOut, MIDI_MAPPER, NULL, NULL, CALLBACK_NULL);
     setFocus();
+    mTimerSuccessfullConnection.setSingleShot(true);
+    connect(&mTimerSuccessfullConnection, &QTimer::timeout, this, &Piano::isConnectionSuccessfull);
 }
 
 Piano::~Piano()
@@ -25,6 +27,7 @@ void Piano::connectToServer(const QHostAddress& host, quint16 port)
     mServerSocket = std::make_unique<ServerSocket>(mPort, host, port, this);
     
     // Send a message to notify server about our connection
+    mTimerSuccessfullConnection.start(WaitForConnectionSeconds * 1000);
     connect(mServerSocket.get(), &ServerSocket::dataReceived, this, &Piano::getMsgFromServer);
     mServerSocket->establishConnection(mMidiInstrument);
 }
@@ -35,6 +38,7 @@ void Piano::createRoom(const QHostAddress& host, quint16 port)
 
     auto setRoomPort = [this, host, port, connection](QByteArray bytes)
     {
+        mIsConnectionSuccessfull = true;
         quint8 command;
         quint16 port;
         QDataStream in(&bytes, QIODevice::ReadOnly);
@@ -46,14 +50,17 @@ void Piano::createRoom(const QHostAddress& host, quint16 port)
 
         QObject::disconnect(*connection);
         delete connection;
+
+        mTimerSuccessfullConnection.start(WaitForConnectionSeconds * 1000);
         connect(mServerSocket.get(), &ServerSocket::dataReceived, this, &Piano::getMsgFromServer);
         mServerSocket->establishConnection(mMidiInstrument);
     };
 
     mServerSocket = std::make_unique<ServerSocket>(mPort, host, port, this);
 
-    mServerSocket->createRoom();
+    mTimerSuccessfullConnection.start(WaitForConnectionSeconds * 1000);
     *connection = connect(mServerSocket.get(), &ServerSocket::dataReceived, setRoomPort);
+    mServerSocket->createRoom();
 }
 
 void Piano::disconnectFormServer()
@@ -70,6 +77,9 @@ void Piano::getMsgFromServer(QByteArray bytes)
         data >> command;
         switch (command)
         {
+        case static_cast<quint8>(ServerSocket::Commands::EstablishConnection):
+            mIsConnectionSuccessfull = true;
+            break;
         case static_cast<quint8>(ServerSocket::Commands::ShortMsg):
             data >> msg;
             if (!mIsMuted || ((msg & 0xF0) == 0xC0)) {
@@ -84,6 +94,16 @@ void Piano::getMsgFromServer(QByteArray bytes)
             break;
         }
     }
+}
+
+void Piano::isConnectionSuccessfull()
+{
+    if (mIsConnectionSuccessfull) {
+        mIsConnectionSuccessfull = false;
+        return;
+    }
+    QMessageBox::warning(this, "Disconnect", "Failed to connect to the specified server");
+    mServerSocket.reset(nullptr);
 }
 
 void Piano::paintEvent(QPaintEvent* event)

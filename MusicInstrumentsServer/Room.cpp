@@ -13,7 +13,6 @@ Room::Room(const QHostAddress& address, quint16 port, quint16 maxDowntime, QObje
     connect(&mTimer, &QTimer::timeout, this, &Room::checkConnection);
     mTimer.start(mMaxDowntime);
 
-    // TODO возможно добавить сигнал который будет говорить родителю вот типа жду, а потом вот типа чел подключился и т.д.
     emit logMessage("Waiting for connections on IP: " + mMyAddress.toString() + ":" + QString::number(mMyPort));
 }
 
@@ -42,6 +41,8 @@ void Room::receiveData()
             mChannels[mClients[ClientAddress(address, port)].channel] = instrument;
             emit logMessage("Connected: " + QHostAddress(address).toString() + ":" + QString::number(port));
 
+            // Tell client that connection was succesfull
+            out << static_cast<quint8>(Commands::EstablishConnection);
             // Send info about current instruments of already connected cliens
             for (auto it = mChannels.constBegin(); it != mChannels.constEnd(); ++it) {
                 out << static_cast<quint8>(Commands::ShortMsg) << static_cast<quint32>(0x0000C0 | (it.value() << 8) | it.key());

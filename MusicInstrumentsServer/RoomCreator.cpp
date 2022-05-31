@@ -63,6 +63,8 @@ void RoomCreator::createRoom()
 
 void RoomCreator::destroyRoom(quint16 port)
 {
+    disconnect(mRooms[port]);
+    delete mRooms[port];
     mRooms.remove(port);
     mAvailablePorts.push(port);
     ui.teLog->append("Port " + QString::number(port) + " is now available");
