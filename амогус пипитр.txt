@@ -1,0 +1,2 @@
+Pizzicato Strings
+Q 3 R 5 R 3 Q МЫШКА W Q мышка_самая_маленькая_белая Q 3 R 5 R 3 5 5 R 3 5 R 3 Q

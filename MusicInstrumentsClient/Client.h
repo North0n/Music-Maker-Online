@@ -5,6 +5,7 @@
 #include <QString>
 #include <QVector>
 #include "FormConnection.h"
+#include "FormCreation.h"
 #include <memory>
 
 class Client : public QMainWindow
@@ -19,12 +20,15 @@ public slots:
 
 	void on_actDisconnect_triggered();
 
+	void on_actCreate_triggered();
+
 private:
     Ui::ClientClass ui;
 
 	void fillInstruments();
 
 	std::unique_ptr<FormConnection> mFormConnection;
+	std::unique_ptr<FormCreation> mFormCreation;
 
 	const QVector<QString> Instruments =
 	{

@@ -1,8 +1,4 @@
 #pragma once
-
-#include <QtWidgets/QMainWindow>
-#include "ui_Server.h"
-
 #include <QUdpSocket>
 #include <QHostAddress>
 #include <QSet>
@@ -10,12 +6,10 @@
 #include <queue>
 #include <QTimer>
 
-class Server : public QMainWindow
+class Room : public QObject
 {
-    Q_OBJECT
-
+	Q_OBJECT
 public:
-
     struct ClientAddress
     {
         ClientAddress(const QHostAddress& Address, quint16 Port)
@@ -45,26 +39,30 @@ public:
 
     enum Commands
     {
+        CreateRoom,
         EstablishConnection,
         ShortMsg,
         Quit,
     };
-
-    Server(quint16 port, QWidget *parent = Q_NULLPTR);
+    
+    Room(const QHostAddress &address, quint16 port, QObject* parent = Q_NULLPTR);
 
     void receiveData();
 
-    static QHostAddress getIpAddress();
+    // TODO add disconnect on timer
+
+signals:
+    void destroyRoom(quint16 port);
 
 private:
-    Ui::ServerClass ui;
+    QHostAddress mMyAddress;
+    quint16 mMyPort;
 
-    std::priority_queue<quint8, std::vector<quint8>, std::greater<>> mAvailableChannels;
-    QHostAddress mHostAddress{ "192.168.0.107" };
-    quint16 mPort;
     QUdpSocket mReceiver;
+    std::priority_queue<quint8, std::vector<quint8>, std::greater<>> mAvailableChannels;
     // Client (address, port) => channel
     QMap<ClientAddress, quint8> mClients;
     // Channel => current instrument
     QMap<quint8, quint32> mChannels;
 };
+

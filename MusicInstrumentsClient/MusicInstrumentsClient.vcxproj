@@ -97,6 +97,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="FormConnection.cpp" />
+    <ClCompile Include="FormCreation.cpp" />
     <ClCompile Include="Piano.cpp" />
     <ClCompile Include="PianoKey.cpp" />
     <ClCompile Include="ServerSocket.cpp" />
@@ -106,6 +107,7 @@
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="main.cpp" />
     <QtUic Include="FormConnection.ui" />
+    <QtUic Include="FormCreation.ui" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Piano.h" />
@@ -113,6 +115,7 @@
   <ItemGroup>
     <QtMoc Include="ServerSocket.h" />
     <QtMoc Include="FormConnection.h" />
+    <QtMoc Include="FormCreation.h" />
     <ClInclude Include="PianoKey.h" />
   </ItemGroup>
   <ItemGroup>

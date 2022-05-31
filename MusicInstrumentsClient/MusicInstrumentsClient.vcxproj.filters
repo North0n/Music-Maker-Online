@@ -52,6 +52,9 @@
     <ClCompile Include="ServerSocket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FormCreation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Piano.h">
@@ -61,6 +64,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="ServerSocket.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="FormCreation.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
@@ -74,6 +80,9 @@
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="FormConnection.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="FormCreation.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

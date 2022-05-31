@@ -5,11 +5,11 @@
 #include <QBrush>
 #include <qdebug.h>
 #include <QtGlobal>
+#include <QMessageBox>
 
 Piano::Piano(QWidget* parent, int keyFirst)
     : QWidget(parent), mKeyFirst(keyFirst), mPixmapLabel(this)
 {
-    
     calcKeyRects();
     midiOutOpen(&hMidiOut, MIDI_MAPPER, NULL, NULL, CALLBACK_NULL);
     setFocus();
@@ -23,29 +23,35 @@ Piano::~Piano()
 void Piano::connectToServer(const QHostAddress& host, quint16 port)
 {
     mServerSocket = std::make_unique<ServerSocket>(mPort, host, port, this);
-    connect(mServerSocket.get(), &ServerSocket::dataReceived, this, &Piano::getMsgFromServer);
+    
     // Send a message to notify server about our connection
-    qDebug() << "Midi instrument" << (void*)mMidiInstrument;
+    connect(mServerSocket.get(), &ServerSocket::dataReceived, this, &Piano::getMsgFromServer);
     mServerSocket->establishConnection(mMidiInstrument);
+}
+
+void Piano::createRoom(const QHostAddress& host, quint16 port)
+{
     auto* const connection = new QMetaObject::Connection;
-    *connection = connect(mServerSocket.get(), &ServerSocket::dataReceived,
-        [this, connection](QByteArray bytes)
-        {
-            quint8 command;
-            QDataStream in(&bytes, QIODevice::ReadOnly);
 
-            in >> command;
-            quint32 message;
-            while (!in.atEnd()) {
-                in >> message;
-                midiOutShortMsg(hMidiOut, message);
-                qDebug() << (void*)message;
-            }
+    auto setRoomPort = [this, host, port, connection](QByteArray bytes)
+    {
+        quint16 port;
+        QDataStream in(&bytes, QIODevice::ReadOnly);
 
-            QObject::disconnect(*connection);
-            delete connection;
-            connect(mServerSocket.get(), &ServerSocket::dataReceived, this, &Piano::getMsgFromServer);
-        });
+        in >> port >> mMaxServerDowntime;
+        mServerSocket->setServerPort(port);
+        QMessageBox::information(this, "Комната создана", QString("Комната создана по адресу ") + host.toString() + ":" + QString::number(port));
+
+        QObject::disconnect(*connection);
+        delete connection;
+        connect(mServerSocket.get(), &ServerSocket::dataReceived, this, &Piano::getMsgFromServer);
+        mServerSocket->establishConnection(mMidiInstrument);
+    };
+
+    mServerSocket = std::make_unique<ServerSocket>(mPort, host, port, this);
+
+    mServerSocket->establishConnection(mMidiInstrument);
+    *connection = connect(mServerSocket.get(), &ServerSocket::dataReceived, setRoomPort);
 }
 
 void Piano::disconnectFormServer()
@@ -57,9 +63,9 @@ void Piano::getMsgFromServer(QByteArray bytes)
 {
     QDataStream data(&bytes, QIODevice::ReadOnly);
     quint32 msg;
-    if (!mIsMuted) {
-        while (!data.atEnd()) {
-            data >> msg;
+    while (!data.atEnd()) {
+        data >> msg;
+        if (!mIsMuted || ((msg & 0xF0) == 0xC0)) {
             midiOutShortMsg(hMidiOut, msg);
         }
     }

@@ -27,6 +27,8 @@ public:
 
 	void connectToServer(const QHostAddress& host, quint16 port);
 
+	void createRoom(const QHostAddress& host, quint16 port);
+
 	void disconnectFormServer();
 
 public slots:
@@ -106,5 +108,6 @@ private:
 	// Network
 	std::unique_ptr<ServerSocket> mServerSocket{ nullptr };
 	quint16 mPort = 20001;
+	quint16 mMaxServerDowntime;
 };
 

@@ -26,13 +26,13 @@
     <QtRcc Include="Server.qrc">
       <Filter>Resource Files</Filter>
     </QtRcc>
-    <QtUic Include="Server.ui">
+    <QtUic Include="RoomCreator.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtMoc Include="Server.h">
+    <QtMoc Include="RoomCreator.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <ClCompile Include="Server.cpp">
+    <ClCompile Include="RoomCreator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -40,5 +40,13 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Room.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="Room.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
 </Project>

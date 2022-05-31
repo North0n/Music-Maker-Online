@@ -13,6 +13,14 @@ ServerSocket::~ServerSocket()
 	quit();
 }
 
+void ServerSocket::createRoom()
+{
+	QByteArray data;
+	QDataStream command(&data, QIODevice::WriteOnly);
+	command << static_cast<quint8>(Commands::CreateRoom);
+	mSocket->writeDatagram(data, mServerAddress, mServerPort);
+}
+
 void ServerSocket::establishConnection(quint8 instrument)
 {
 	QByteArray data;

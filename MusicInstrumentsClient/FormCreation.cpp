@@ -1,12 +1,12 @@
-#include "FormConnection.h"
-#include "ui_FormConnection.h"
+#include "FormCreation.h"
+#include "ui_FormCreation.h"
 
 #include <QIntValidator>
 #include <QRegularExpression>
 
-FormConnection::FormConnection(QWidget *parent)
+FormCreation::FormCreation(QWidget *parent)
 	: QWidget(parent),
-    ui(new Ui::FormConnection)
+	ui(new Ui::FormCreation)
 {
     setWindowFlags(Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     setWindowModality(Qt::WindowModal);
@@ -22,19 +22,19 @@ FormConnection::FormConnection(QWidget *parent)
     ui->leIp->setValidator(mIpValidator.get());
 }
 
-FormConnection::~FormConnection()
+FormCreation::~FormCreation()
 {
 	delete ui;
 }
 
-void FormConnection::on_pbConnect_clicked()
+void FormCreation::on_pbCreate_clicked()
 {
     if (ui->leIp->hasAcceptableInput() && ui->lePort->hasAcceptableInput())
-        emit onConnectPressed(QHostAddress(ui->leIp->text()), ui->lePort->text().toInt());
+        emit onCreatePressed(QHostAddress(ui->leIp->text()), ui->lePort->text().toInt());
     close();
 }
 
-void FormConnection::on_pbCancel_clicked()
+void FormCreation::on_pbCancel_clicked()
 {
     close();
 }

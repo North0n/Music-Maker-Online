@@ -15,6 +15,7 @@ public:
 
 	enum class Commands
 	{
+		CreateRoom,
 		EstablishConnection,
 		ShortMsg,
 		Quit,
@@ -25,6 +26,8 @@ public:
 	~ServerSocket();
 
 	void setServerPort(quint16 port) { mServerPort = port; }
+
+	void createRoom();
 
 	void establishConnection(quint8 instrument);
 

@@ -71,6 +71,7 @@
     <property name="title">
      <string>Сеть</string>
     </property>
+    <addaction name="actCreate"/>
     <addaction name="actConnect"/>
     <addaction name="actDisconnect"/>
    </widget>
@@ -78,7 +79,7 @@
   </widget>
   <action name="actConnect">
    <property name="text">
-    <string>Подключиться</string>
+    <string>Подключиться к комнате</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
@@ -90,6 +91,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="actCreate">
+   <property name="text">
+    <string>Создать комнату</string>
    </property>
   </action>
  </widget>

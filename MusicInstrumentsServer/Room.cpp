@@ -1,52 +1,35 @@
-#include "Server.h"
+#include "Room.h"
 
-#include <QByteArray>
-#include <QDataStream>
-#include <QNetworkInterface>
-#include <qdebug.h>
-
-QHostAddress Server::getIpAddress()
-{
-    const QHostAddress& localhost = QHostAddress(QHostAddress::LocalHost);
-    for (const QHostAddress& address : QNetworkInterface::allAddresses()) {
-        if (address.protocol() == QAbstractSocket::IPv4Protocol && address != localhost)
-            return address;
-    }
-    return QHostAddress::LocalHost;
-}
-
-Server::Server(quint16 port, QWidget *parent)
-    : QMainWindow(parent), mPort(port)
+Room::Room(const QHostAddress& address, quint16 port, QObject* parent)
+    : mMyAddress(address), mMyPort(port)
 {
     for (int i = 0; i < 10; ++i)
         mAvailableChannels.push(i);
 
-    ui.setupUi(this);
-
     // TODO менять бинд при изменении пользователем адреса
-    mReceiver.bind(mHostAddress, mPort);
-    connect(&mReceiver, &QUdpSocket::readyRead, this, &Server::receiveData);
+    mReceiver.bind(mMyAddress, mMyPort);
+    connect(&mReceiver, &QUdpSocket::readyRead, this, &Room::receiveData);
 
-    ui.teLog->append("Waiting for connections on IP: " + mHostAddress.toString() + ":" + QString::number(mPort));
+    // TODO возможно добавить сигнал который будет говорить родителю вот типа жду, а потом вот типа чел подключился и т.д.
+    qInfo() << "Waiting for connections on IP: " + mMyAddress.toString() + ":" + QString::number(mMyPort);
 }
 
-void Server::receiveData()
+void Room::receiveData()
 {
     QHostAddress address;
     quint16 port;
     QByteArray data(mReceiver.pendingDatagramSize(), '\0');
     mReceiver.readDatagram(data.data(), mReceiver.pendingDatagramSize(), &address, &port);
-    
+
     QByteArray datagram;
-    QDataStream in(&data, QIODevice::ReadOnly), 
-                out(&datagram, QIODevice::WriteOnly);
+    QDataStream in(&data, QIODevice::ReadOnly),
+        out(&datagram, QIODevice::WriteOnly);
     quint8 command, instrument;
     quint32 message;
     ClientAddress client;
-    QMap<ClientAddress, quint8>::const_iterator it;
     while (!in.atEnd()) {
         in >> command;
-        switch (command)  
+        switch (command)
         {
         case Commands::EstablishConnection:
             if (mAvailableChannels.empty())
@@ -56,10 +39,10 @@ void Server::receiveData()
             in >> instrument;
             qDebug() << (void*)instrument;
             mChannels[mClients[ClientAddress(address, port)]] = instrument;
-            ui.teLog->append("Connected: " + QHostAddress(address).toString() + ":" + QString::number(port));
+            qInfo() << "Connected: " + QHostAddress(address).toString() + ":" + QString::number(port);
+            //ui.teLog->append("Connected: " + QHostAddress(address).toString() + ":" + QString::number(port));
 
             // Send info about current instruments of already connected cliens
-            out << static_cast<quint8>(Commands::EstablishConnection);
             for (auto it = mChannels.constBegin(); it != mChannels.constEnd(); ++it) {
                 out << static_cast<quint32>(0x0000C0 | (it.value() << 8) | it.key());
             }
@@ -69,7 +52,14 @@ void Server::receiveData()
             client = ClientAddress(address, port);
             mAvailableChannels.push(mClients[client]);
             mClients.remove(client);
-            ui.teLog->append("Disconnected: " + QHostAddress(address).toString() + ":" + QString::number(port));
+            qInfo() << "Disconnected: " + QHostAddress(address).toString() + ":" + QString::number(port);
+
+            // If last client disconnected the destroy the room
+            if (mAvailableChannels.size() == 10) {
+                emit destroyRoom(mMyPort);
+                qInfo() << "Last client left. Room " + QHostAddress(address).toString() + ":" + QString::number(port) + " is destroyed.";
+            }
+            //ui.teLog->append("Disconnected: " + QHostAddress(address).toString() + ":" + QString::number(port));
             break;
         case Commands::ShortMsg:
             in >> message;
@@ -78,14 +68,14 @@ void Server::receiveData()
             }
             message |= mClients[ClientAddress(address, port)];
             out << message;
-            it = mClients.constBegin();
-            while (it != mClients.constEnd()) {
+            for (auto it = mClients.constBegin(); it != mClients.constEnd(); ++it) {
+                qInfo() << QHostAddress(it.key().address).toString() + ":" + QString::number(it.key().port) << (void*)message;
                 mReceiver.writeDatagram(datagram, QHostAddress(it.key().address), it.key().port);
-                ++it;
             }
             break;
         default:
-            ui.teLog->append("Unknown command: " + QString::number(command));
+            qInfo() << "Unknown command: " + QString::number(command);
+            //ui.teLog->append("Unknown command: " + QString::number(command));
         }
     }
 }
