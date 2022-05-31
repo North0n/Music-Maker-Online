@@ -97,6 +97,9 @@
    <property name="text">
     <string>Создать комнату</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+G</string>
+   </property>
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

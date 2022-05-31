@@ -19,6 +19,10 @@ public:
 signals:
 	void onCreatePressed(const QHostAddress& hostname, quint16 port);
 
+protected:
+
+	void keyPressEvent(QKeyEvent* event) override;
+
 private slots:
 	void on_pbCreate_clicked();
 

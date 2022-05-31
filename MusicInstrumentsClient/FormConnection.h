@@ -5,6 +5,7 @@
 #include <QValidator>
 #include <QHostAddress>
 #include <memory>
+#include <QKeyEvent>
 
 namespace Ui { class FormConnection; };
 
@@ -18,6 +19,11 @@ public:
 
 signals:
 	void onConnectPressed(const QHostAddress& hostname, quint16 port);
+
+
+protected:
+
+	void keyPressEvent(QKeyEvent* event) override;
 
 private slots:
 	void on_pbConnect_clicked();

@@ -3,6 +3,7 @@
 
 #include <QIntValidator>
 #include <QRegularExpression>
+#include <QKeyEvent>
 
 FormCreation::FormCreation(QWidget *parent)
 	: QWidget(parent),
@@ -37,4 +38,11 @@ void FormCreation::on_pbCreate_clicked()
 void FormCreation::on_pbCancel_clicked()
 {
     close();
+}
+
+void FormCreation::keyPressEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key_Escape) {
+        on_pbCancel_clicked();
+    }
 }

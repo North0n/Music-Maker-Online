@@ -31,13 +31,26 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QWidget" name="wVisualization" native="true"/>
+     <widget class="QWidget" name="wVisualization" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+     </widget>
     </item>
     <item>
      <widget class="QTextEdit" name="teLog">
+      <property name="minimumSize">
+       <size>
+        <width>500</width>
+        <height>0</height>
+       </size>
+      </property>
       <property name="maximumSize">
        <size>
-        <width>200</width>
+        <width>500</width>
         <height>16777215</height>
        </size>
       </property>

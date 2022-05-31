@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QtWidgets/QMainWindow>
-#include "ui_Server.h"
+#include "ui_RoomCreator.h"
 
 #include "Room.h"
 #include <QUdpSocket>

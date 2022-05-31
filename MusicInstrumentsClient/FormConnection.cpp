@@ -34,6 +34,13 @@ void FormConnection::on_pbConnect_clicked()
     close();
 }
 
+void FormConnection::keyPressEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key_Escape) {
+        on_pbCancel_clicked();
+    }
+}
+
 void FormConnection::on_pbCancel_clicked()
 {
     close();
