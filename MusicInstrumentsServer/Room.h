@@ -66,6 +66,8 @@ public:
 signals:
     void destroyRoom(quint16 port);
 
+    void logMessage(QString message);
+
 private slots:
     void checkConnection();
 

@@ -43,6 +43,7 @@ void RoomCreator::createRoom()
     }
     mRooms[mAvailablePorts.top()] = new Room(mHostAddress, mAvailablePorts.top(), MaxRoomDowntime, this);
     ui.teLog->append("Created: room: " + mHostAddress.toString() + ":" + QString::number(mAvailablePorts.top()));
+    connect(mRooms[mAvailablePorts.top()], &Room::logMessage, this, &RoomCreator::logMessageFromRoom);
     connect(mRooms[mAvailablePorts.top()], &Room::destroyRoom, this, &RoomCreator::destroyRoom);
 
     QByteArray configuration;
@@ -59,5 +60,10 @@ void RoomCreator::destroyRoom(quint16 port)
 {
     mRooms.remove(port);
     mAvailablePorts.push(port);
-    ui.teLog->append("Destroyed: room " + mHostAddress.toString() + ":" + QString::number(port));
+    ui.teLog->append("Port " + QString::number(port) + " is now available");
+}
+
+void RoomCreator::logMessageFromRoom(QString message)
+{
+    ui.teLog->append(message);
 }

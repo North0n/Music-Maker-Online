@@ -8,14 +8,13 @@ Room::Room(const QHostAddress& address, quint16 port, quint16 maxDowntime, QObje
     for (int i = 0; i < 10; ++i)
         mAvailableChannels.push(i);
 
-    // TODO менять бинд при изменении пользователем адреса
     mReceiver.bind(mMyAddress, mMyPort);
     connect(&mReceiver, &QUdpSocket::readyRead, this, &Room::receiveData);
     connect(&mTimer, &QTimer::timeout, this, &Room::checkConnection);
     mTimer.start(mMaxDowntime);
 
     // TODO возможно добавить сигнал который будет говорить родителю вот типа жду, а потом вот типа чел подключился и т.д.
-    qInfo() << "Waiting for connections on IP: " + mMyAddress.toString() + ":" + QString::number(mMyPort);
+    emit logMessage("Waiting for connections on IP: " + mMyAddress.toString() + ":" + QString::number(mMyPort));
 }
 
 void Room::receiveData()
@@ -41,7 +40,7 @@ void Room::receiveData()
             mAvailableChannels.pop();
             in >> instrument;
             mChannels[mClients[ClientAddress(address, port)].channel] = instrument;
-            qInfo() << "Connected: " + QHostAddress(address).toString() + ":" + QString::number(port);
+            emit logMessage("Connected: " + QHostAddress(address).toString() + ":" + QString::number(port));
 
             // Send info about current instruments of already connected cliens
             for (auto it = mChannels.constBegin(); it != mChannels.constEnd(); ++it) {
@@ -50,7 +49,7 @@ void Room::receiveData()
             mReceiver.writeDatagram(datagram, address, port);
             break;
         case Commands::Quit:
-            qInfo() << "Disconnected: " + QHostAddress(address).toString() + ":" + QString::number(port);
+            emit logMessage("Disconnected: " + QHostAddress(address).toString() + ":" + QString::number(port));
             disconnectClient(ClientAddress(address, port));
             break;
         case Commands::ShortMsg:
@@ -70,7 +69,7 @@ void Room::receiveData()
             }
             break;
         default:
-            qInfo() << "Unknown command: " + QString::number(command);
+            emit logMessage("Unknown command: " + QString::number(command));
             //ui.teLog->append("Unknown command: " + QString::number(command));
         }
     }
@@ -83,7 +82,7 @@ void Room::disconnectClient(const ClientAddress& client)
 
     // If last client disconnected then destroy the room
     if (mAvailableChannels.size() == 10) {
-        qInfo() << "Last client left. Room " + mMyAddress.toString() + ":" + QString::number(mMyPort) + " is destroyed.";
+        emit logMessage("Last client left. Room " + mMyAddress.toString() + ":" + QString::number(mMyPort) + " is destroyed.");
         emit destroyRoom(mMyPort);
     }
 }
@@ -107,7 +106,7 @@ void Room::checkConnection()
         out << static_cast<quint8>(Commands::Quit);
         mReceiver.writeDatagram(datagram, QHostAddress(client.address), client.port);
 
-        qInfo() << "Disconnected: " + QHostAddress(client.address).toString() + ":" + QString::number(client.port) << " due to long timeout";
+        emit logMessage("Disconnected: " + QHostAddress(client.address).toString() + ":" + QString::number(client.port) + " due to long timeout");
         disconnectClient(client);
     }
 }
