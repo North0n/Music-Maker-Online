@@ -1,4 +1,5 @@
 <RCC>
-    <qresource prefix="Server">
+    <qresource prefix="/Server">
+        <file>img/server.png</file>
     </qresource>
 </RCC>

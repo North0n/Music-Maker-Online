@@ -112,6 +112,7 @@ void Piano::paintEvent(QPaintEvent* event)
     static QBrush brushBlack(Qt::black), brushWhite(Qt::white), brushPressed(Qt::gray);
 
     mPianoPixmap = QPixmap(size().width(), qMin(size().height(), WhiteHeight) + 1);
+    mPianoPixmap.fill(Qt::transparent);
     mPixmapLabel.setFixedSize(mPianoPixmap.size());
 
     int keyFirst = mKeyFirst - static_cast<int>(isBlack(mKeyFirst));
@@ -120,7 +121,7 @@ void Piano::paintEvent(QPaintEvent* event)
     painter.setPen(penBlack);
     // White keys are drawn first, then black, because they overlap
     for (int color = 0; color < 2; ++color) {
-        for (int key = keyFirst; key < KeysCount && mPianoKeys[key].rect().left() <= geometry().right(); ++key) {
+        for (int key = keyFirst; key < KeysCount && mPianoKeys[key].rect().right() <= geometry().right(); ++key) {
             if (!mPianoKeys[key].isBlack() ^ color) {
                 if (mPianoKeys[key].isPressed()) {
                     painter.setBrush(brushPressed);

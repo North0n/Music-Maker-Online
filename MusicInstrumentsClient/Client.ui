@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Client</string>
+   <string>Online Orchestra</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="Client.qrc">
+    <normaloff>:/Client/img/piano.png</normaloff>:/Client/img/piano.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">

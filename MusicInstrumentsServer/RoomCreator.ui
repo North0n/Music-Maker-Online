@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Server</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="Server.qrc">
+    <normaloff>:/Server/img/server.png</normaloff>:/Server/img/server.png</iconset>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <property name="spacing">

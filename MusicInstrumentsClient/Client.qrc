@@ -1,4 +1,5 @@
 <RCC>
-    <qresource prefix="Client">
+    <qresource prefix="/Client">
+        <file>img/piano.png</file>
     </qresource>
 </RCC>
